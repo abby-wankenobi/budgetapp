@@ -20,6 +20,7 @@ var budgetController = (function(){
     data.totals[type] = sum
   }
 
+  // data that will be searched through for other modules
   var data = {
     allItems: {
       expense: [],
@@ -100,6 +101,7 @@ var budgetController = (function(){
       }
     },
 
+    //take this out in final version
     testing: function() {
       console.log(data)
     }
@@ -162,10 +164,12 @@ var UIController = (function() {
 
         fieldsArr = Array.prototype.slice.call(fields);
 
+        //why is index/array important in this line?
         fieldsArr.forEach(function(current, index, array){
           current.value = "";
         })
 
+        //set cursor back to first field
         fieldsArr[0].focus();
       },
 
@@ -276,4 +280,5 @@ var controller = (function(budgetCtrl, UICtrl) {
 })(budgetController, UIController);
 
 
+//sets up initial event listeners which will trigger all actions when clicked
 controller.init();
