@@ -20,7 +20,6 @@ var budgetController = (function(){
     data.totals[type] = sum
   }
 
-  // data that will be searched through for other modules
   var data = {
     allItems: {
       expense: [],
@@ -101,7 +100,6 @@ var budgetController = (function(){
       }
     },
 
-    //take this out in final version
     testing: function() {
       console.log(data)
     }
@@ -154,13 +152,18 @@ var UIController = (function() {
         newHtml = newHtml.replace('%value%', obj.value);
 
         //insert html into DOM
-        document.querySelector(element).insertAdjacentHTML('beforeend', newHtml)
+        document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+      },
+
+      deleteListItem: function(id) {
+        var el = document.getElementById(id);
+        el.parentNode.removeChild(el);
       },
 
       clearFields: function() {
         var fields, fieldsArr;
 
-        fields = document.querySelectorAll(DOMstrings.inputDescription + ',' + DOMstrings.inputValue)
+        fields = document.querySelectorAll(DOMstrings.inputDescription + ',' + DOMstrings.inputValue);
 
         fieldsArr = Array.prototype.slice.call(fields);
 
@@ -184,10 +187,6 @@ var UIController = (function() {
         } else {
           document.querySelector(DOMstrings.percentageLabel).textContent = '--';
         }
-      },
-
-      displayBudget: function(obj) {
-
       },
 
       getDOMstrings: function() {
@@ -257,9 +256,12 @@ var controller = (function(budgetCtrl, UICtrl) {
 
       // delete item from data structure
       budgetCtrl.deleteItem(type, ID);
-      // delete item from UI
-      // update new budget
 
+      // delete item from UI
+      UICtrl.deleteListItem(itemID)
+
+      // update new budget
+      updateBudget();
     }
 
   };
@@ -281,4 +283,5 @@ var controller = (function(budgetCtrl, UICtrl) {
 
 
 //sets up initial event listeners which will trigger all actions when clicked
+//only method being invoked when page is loaded, all other methods stem from this one
 controller.init();
