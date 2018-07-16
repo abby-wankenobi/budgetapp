@@ -1,16 +1,29 @@
 var budgetController = (function(){
 
   var Expense = function(id, description, value) {
-    this.id = id,
-    this.description = description,
-    this.value = value
-  }
+    this.id = id;
+    this.description = description;
+    this.value = value;
+    this.percentage = -1;
+  };
+
+  Expense.prototype.calcPercentage = function(totalIncome) {
+    if (totalIncome > 0){
+      this.percentage = Math.round((this.value / totalIncome) * 100);
+    } else {
+      this.percentage = -1
+    }
+  };
+
+  Expense.prototype.getPercentage = function() {
+    return this.percentage;
+  };
 
   var Income = function(id, description, value) {
-    this.id = id,
-    this.description = description,
-    this.value = value
-  }
+    this.id = id;
+    this.description = description;
+    this.value = value;
+  };
 
   var calculateTotal = function(type) {
     var sum = 0;
@@ -18,7 +31,7 @@ var budgetController = (function(){
       sum += e.value;
     });
     data.totals[type] = sum
-  }
+  };
 
   var data = {
     allItems: {
@@ -89,6 +102,19 @@ var budgetController = (function(){
         data.percentage = -1;
       }
 
+    },
+
+    calculatePercentages: function() {
+      data.allItems.expense.forEach(function(current){
+        current.calcPercentage(data.totals.income);
+      });
+    },
+
+    getPercentages: function() {
+      var allPerc = data.allItems.expense.map(function(current){
+        return current.getPercentage();
+      });
+      return allPerc;
     },
 
     getBudget: function() {
@@ -222,7 +248,18 @@ var controller = (function(budgetCtrl, UICtrl) {
 
     //3. display budget on UI
     UICtrl.displayBudget(budget);
-  }
+  };
+
+  var updatePercentages = function() {
+    //1. calculate percentages
+    budgetCtrl.calculatePercentages();
+
+    //2. read percentage from budget controller
+    var percentages = budgetCtrl.getPercentages();
+
+    //3. update UI
+    console.log(percentages)
+  };
 
   var ctrlAddItem = function() {
     var input, newItem;
@@ -241,6 +278,8 @@ var controller = (function(budgetCtrl, UICtrl) {
       UICtrl.clearFields();
       //5. calculate/update budget
       updateBudget();
+      //6. calculate/update percentages
+      updatePercentages();
     }
   }
 
@@ -254,14 +293,17 @@ var controller = (function(budgetCtrl, UICtrl) {
       type = splitID[0];
       ID = parseInt(splitID[1]);
 
-      // delete item from data structure
+      // 1. delete item from data structure
       budgetCtrl.deleteItem(type, ID);
 
-      // delete item from UI
+      // 2. delete item from UI
       UICtrl.deleteListItem(itemID)
 
-      // update new budget
+      // 3. update new budget
       updateBudget();
+
+      // 4. calculate/update percentages
+      updatePercentages();
     }
 
   };
